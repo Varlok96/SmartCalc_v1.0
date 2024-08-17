@@ -1,0 +1,365 @@
+
+#test infix_to_postfix_1
+char input[255] = "2+5/2";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("2 5 2 / + ", postfix); 
+
+#test infix_to_postfix_2
+char input[255] = "-2+5/2";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 - 5 2 / + ", postfix); 
+
+#test infix_to_postfix_3
+char input[255] = "2/5+2";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("2 5 / 2 + ", postfix); 
+
+#test infix_to_postfix_4
+char input[255] = "-2/5+2";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 5 / - 2 + ", postfix); 
+
+#test infix_to_postfix_5
+char input[255] = "-2+5/2*(-4*3/2)-1";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 - 5 2 / 0 4 3 * 2 / - * + 1 - ", postfix); 
+
+#test infix_to_postfix_6
+char input[255] = "-2+5/((2*(-4*3/2))-1)";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 - 5 2 0 4 3 * 2 / - * 1 - / + ", postfix); 
+
+#test infix_to_postfix_7
+char input[255] = "-2*(((5*3)/4)/1)";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 5 3 * 4 / 1 / * - ", postfix); 
+
+#test infix_to_postfix_8
+char input[255] = "-2*((5*3)/4)";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("0 2 5 3 * 4 / * - ", postfix); 
+
+#test infix_to_postfix_9
+char input[255] = "2-4/(45-6)*12-(42+53)";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("2 4 45 6 - / 12 * - 42 53 + - ", postfix); 
+
+#test infix_to_postfix_10
+char input[255] = "4/(45-6)*12-4";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("4 45 6 - / 12 * 4 - ", postfix); 
+
+#test infix_to_postfix_11
+char input[255] = "2-4/(45-6)*12-(42+53)";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("2 4 45 6 - / 12 * - 42 53 + - ", postfix); 
+
+#test infix_to_postfix_12
+char input[255] = "2.2+5/2";
+char postfix[255] = {0};
+pars(input, postfix);
+ck_assert_str_eq("2.2 5 2 / + ", postfix); 
+
+#test smart_calc_1
+char input[255] = {'\0'};
+pars("1*2+3", input);
+ck_assert_str_eq(input, "1 2 * 3 + ");
+
+#test smart_calc_2
+char input[255] = {'\0'};
+pars("1+2*3", input);
+ck_assert_str_eq(input, "1 2 3 * + ");
+
+#test smart_calc_3
+char input[255] = {'\0'};
+pars("1+2*3/4-5", input);
+ck_assert_str_eq(input, "1 2 3 * 4 / + 5 - ");
+
+#test smart_calc_4
+char input[255] = {'\0'};
+pars("1+2*(3/4-5)", input);
+ck_assert_str_eq(input, "1 2 3 4 / 5 - * + ");
+
+
+#test smart_calc_5
+char input[255] = {'\0'};
+pars("(1+2)/44*(3/(4-5))", input);
+ck_assert_str_eq(input, "1 2 + 44 / 3 4 5 - / * ");
+
+#test smart_calc_6
+char input[255] = {'\0'};
+pars("(1+2)/(44*(3/(4-5)))", input);
+ck_assert_str_eq(input, "1 2 + 44 3 4 5 - / * / ");
+
+#test smart_calc_7
+char input[255] = {'\0'};
+pars("-((1+2)/(44*(3/(4-5))))", input);
+ck_assert_str_eq(input, "0 1 2 + 44 3 4 5 - / * / - ");
+
+#test smart_calc_8
+char input[255] = {'\0'};
+pars("(-((1+2))/(-(44*(3/(4-5)))))", input);
+ck_assert_str_eq(input, "0 1 2 + 0 44 3 4 5 - / * - / - ");
+
+#test smart_calc_9
+char input[255] = {'\0'};
+pars("2.34-43.123", input);
+ck_assert_str_eq(input, "2.34 43.123 - ");
+
+#test smart_calc_10
+char input[255] = {'\0'};
+pars("2.34-43.123/(456.312-654)*123.543-(42.123+534.432)", input);
+ck_assert_str_eq(input, "2.34 43.123 456.312 654 - / 123.543 * - 42.123 534.432 + - ");
+
+#test smart_calc_11
+char input[255] = {'\0'};
+pars("-3+2+(-2)", input);
+ck_assert_str_eq(input, "0 3 - 2 + 0 2 - + ");
+
+#test smart_calc_12
+char input[255] = {'\0'};
+pars("-3+2+(-2)/4*(123.543)", input);
+ck_assert_str_eq(input, "0 3 - 2 + 0 2 - 4 / 123.543 * + ");
+
+#test smart_calc_13
+char input[255] = {'\0'};
+pars("-3+2+(-2)/4*(123.543)-(423.654+123*54.34/1)", input);
+ck_assert_str_eq(input, "0 3 - 2 + 0 2 - 4 / 123.543 * + 423.654 123 54.34 * 1 / + - ");
+
+#test smart_calc_14
+char input[255] = {'\0'};
+pars("-3+2+(-2)/4*(123.543)-(423.654+123*54.34/1)-123", input);
+ck_assert_str_eq(input, "0 3 - 2 + 0 2 - 4 / 123.543 * + 423.654 123 54.34 * 1 / + - 123 - ");
+
+#test smart_calc_15
+char input[255] = {'\0'};
+pars("-(3+2+(-2)/4*(123.543)-(423.654+123*54.34/1)-423)", input);
+ck_assert_str_eq(input, "0 3 2 + 0 2 - 4 / 123.543 * + 423.654 123 54.34 * 1 / + - 423 - - ");
+
+#test smart_calc_16
+char input[255] = {'\0'};
+pars("sin(321.432-654.234)", input);
+ck_assert_str_eq(input, "321.432 654.234 - s ");
+
+#test smart_calc_17
+char input[255] = {'\0'};
+pars("sin(321.432-654.234+cos(-43.32+34.65/432+123))", input);
+ck_assert_str_eq(input, "321.432 654.234 - 0 43.32 - 34.65 432 / + 123 + c + s ");
+
+#test smart_calc_18
+char input[255] = {'\0'};
+pars("2^123.543", input);
+ck_assert_str_eq(input, "2 123.543 ^ ");
+
+#test smart_calc_19
+char input[255] = {'\0'};
+pars("(2+5/3)^123.543", input);
+ck_assert_str_eq(input, "2 5 3 / + 123.543 ^ ");
+
+
+#test smart_calc_20
+char input[255] = {'\0'};
+pars("-(-2)+3", input);
+ck_assert_str_eq(input, "0 0 2 - - 3 + ");
+
+
+#test smart_res_1
+double result = 0;
+double x = 0;
+math_operations(x, "1 2 * 3 + ", &result);
+ck_assert_double_eq(result, 5);
+
+#test smart_res_2
+double result = 0;
+double x = 0;
+math_operations(x, "1 2 3 * +", &result);
+ck_assert_double_eq(result, 7);
+
+#test smart_res_3
+double result = 0.0;
+double x = 0;
+math_operations(x, "1 2 3 * 4 / + 5 -", &result);
+ck_assert_double_eq(result, -2.5);
+
+#test smart_res_4
+double result = 0;
+double x = 0;
+math_operations(x, "1 2 3 4 / 5 - * +", &result);
+ck_assert_double_eq(result, -7.5);
+
+#test smart_res_5
+double orig = sin(45);
+double result = 0;
+double x = 0;
+math_operations(x, "45 s", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_6
+double orig = cos(45);
+double result = 0;
+double x = 0;
+math_operations(x, "45 c", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_7
+double orig = tan(45);
+double result = 0;
+double x = 0;
+math_operations(x, "45 t", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_8
+char res_pol[255] = {'\0'};
+pars("sin(4*(1+2*(3*4-5)))", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = sin(60);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_9
+// double orig = 10 % 3;
+double result = 0.0;
+double x = 0;
+math_operations(x, "10 3 %", &result);
+ck_assert_double_eq(result, 1);
+
+#test smart_res_10
+double orig = asin(1);
+double result = 0;
+double x = 0;
+math_operations(x, "1 S", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_11
+double orig = acos(1);
+double result = 0;
+double x = 0;
+math_operations(x, "1 C", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_12
+double orig = atan(30);
+double result = 0;
+double x = 0;
+math_operations(x, "30 T", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_13
+double orig = log(45);
+double result = 0;
+double x = 0;
+math_operations(x, "45 l", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_14
+double orig = log10(45);
+double result = 0;
+double x = 0;
+math_operations(x, "45 L", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_15
+double orig = sqrt(9);
+double result = 0;
+double x = 0;
+math_operations(x, "9 k", &result);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_16
+char res_pol[255] = {'\0'};
+pars("asin(0.5)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = asin(0.5);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_17
+char res_pol[255] = {'\0'};
+pars("acos(0.5)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = acos(0.5);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_18
+char res_pol[255] = {'\0'};
+pars("atg(0.3)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = atan(0.3);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_19
+char res_pol[255] = {'\0'};
+pars("log(0.3)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = log10(0.3);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_20
+char res_pol[255] = {'\0'};
+pars("ln(0.3)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = log(0.3);
+ck_assert_double_eq(result, orig);
+
+#test smart_res_21
+char res_pol[255] = {'\0'};
+pars("sqrt(9)", res_pol);
+double result = 0.0;
+double x = 0;
+math_operations(x, res_pol, &result);
+double orig = sqrt(9);
+ck_assert_double_eq(result, orig);
+
+
+#test infix_to_postfix_to_res_1
+char input[255] = "2+5/2";
+char postfix[255] = {0};
+double result = 0.0;
+double x = 0;
+pars(input, postfix);
+math_operations(x, "2 5 2 / + ", &result);
+ck_assert_str_eq("2 5 2 / + ", postfix); 
+
+#test calculate
+//2+3-1
+char postfix[255] = "2 3 + 1 - ";
+double result = 0;
+double x = 0;
+math_operations(x, postfix, &result);
+ck_assert_double_eq(result, 4.0);
+
+#test calculate1
+  //5*5;
+char postfix1[255] = "5 5 * ";
+double result1 = 0;
+double x = 0;
+math_operations(x, postfix1, &result1);
+ck_assert_double_eq(result1, 25);
+
+#test calculate2
+char postfix1[255] = "0.5 x * ";
+double result1 = 0;
+double x = 5;
+math_operations(x, postfix1, &result1);
+ck_assert_double_eq(result1, 2.5);
